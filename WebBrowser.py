@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QGridLayout, QMenuBar, QPlainTextEdit, QAction, QFileDialog
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtCore import QUrl
@@ -9,6 +9,9 @@ class Window(QWidget):
 
     def __init__(self):
         super().__init__()
+
+        self.layout = QGridLayout()
+        self.setLayout(self.layout)
         self.title = 'WebBrowser'
         self.width = 1280
         self.height = 720
@@ -17,7 +20,7 @@ class Window(QWidget):
 
         self.webview()
         self.show_window()
-
+        self.menu_bar()
 
 
     def show_window(self):
@@ -41,8 +44,44 @@ class Window(QWidget):
         self.webEngineView = QWebEngineView()
         self.webEngineView.setUrl(QUrl('https://www.google.com'))
         webview.addWidget(self.webEngineView)
+        
 
         self.setLayout(webview)
+
+    def menu_bar(self):
+        menubar = QMenuBar()
+        self.layout.addWidget(menubar, 0, 0)
+
+        file_menu = menubar.addMenu('File')
+        file_edit = menubar.addMenu('Edit')
+        file_help = menubar.addMenu('Help')
+        action_open = QAction('Open', self)
+        action_open.triggered.connect(self.open_file)
+
+        action_exit = QAction('Exit', self)
+        action_exit.setShortcut('Ctrl+Q')
+        action_exit.triggered.connect(self.close)
+
+        file_menu.addAction(action_exit)
+        file_menu.addAction(action_open)
+        text_box = QPlainTextEdit()
+
+        self.layout.addWidget(text_box, 1, 0)
+
+    def open_file(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt);;All Files (*)",
+                                                   options=options)
+
+        try:
+            with open(file_name, 'r') as f:
+                file_content = f.read()
+                print(file_content)
+
+        except Exception as ex:
+            print(f'There was an exception: {ex}')
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

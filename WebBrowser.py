@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QGridLayout, QMenuBar, QPlainTextEdit, QAction, QFileDialog
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, QVBoxLayout, QWidget, QGridLayout, QMenuBar,\
+    QPlainTextEdit, QAction, QFileDialog, QShortcut
+from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import QUrl, Qt
 import sys
 
 
@@ -52,20 +53,25 @@ class Window(QWidget):
         menubar = QMenuBar()
         self.layout.addWidget(menubar, 0, 0)
 
+        shortcut_exit = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_W), self)
+        shortcut_open = QShortcut(QKeySequence(Qt.CTRL + Qt.Key_Q), self)
+
         file_menu = menubar.addMenu('File')
         file_edit = menubar.addMenu('Edit')
         file_help = menubar.addMenu('Help')
-        action_open = QAction('Open', self)
-        action_open.triggered.connect(self.open_file)
 
+        action_open = QAction('Open', self)
         action_exit = QAction('Exit', self)
-        action_exit.setShortcut('Ctrl+Q')
+
+        action_open.triggered.connect(self.open_file)
         action_exit.triggered.connect(self.close)
+        shortcut_exit.activated.connect(self.close)
+        shortcut_open.activated.connect(self.open_file)
 
         file_menu.addAction(action_exit)
         file_menu.addAction(action_open)
-        text_box = QPlainTextEdit()
 
+        text_box = QPlainTextEdit()
         self.layout.addWidget(text_box, 1, 0)
 
     def open_file(self):
